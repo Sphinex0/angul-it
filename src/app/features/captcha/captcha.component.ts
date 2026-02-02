@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { CaptchaService } from '../../core/services/captcha.service';
 
 @Component({
   selector: 'app-captcha',
@@ -7,5 +8,11 @@ import { Component } from '@angular/core';
   styleUrl: './captcha.component.css',
 })
 export class CaptchaComponent {
+  captchaService = inject(CaptchaService);
 
+  constructor() {
+    this.captchaService.startNewSession()
+    console.log(this.captchaService.allStages());
+    
+  }
 }

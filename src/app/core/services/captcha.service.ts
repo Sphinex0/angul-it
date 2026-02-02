@@ -44,7 +44,7 @@ export class CaptchaService {
     const totalStages = 3; // How many levels user must pass
 
     // 1. Define possible tasks
-    const possibleTasks = ['cat', 'traffic'];
+    const possibleTasks = ['Hydrant', 'Stair', 'Car'];
 
     for (let i = 0; i < totalStages; i++) {
       // 2. Pick a random target (e.g., 'cat')
