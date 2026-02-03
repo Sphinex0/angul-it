@@ -1,6 +1,7 @@
 export interface ImageChallengeData {
+  target: string;
   items: {
-    id: string;
+    id: number;
     src: string;
   }[];
 }
@@ -17,7 +18,7 @@ export interface CaptchaStage {
   id: string;
   type: 'image' | 'math' | 'text';
   prompt: string;
-  data: ImageChallengeData | MathChallengeData | TextChallengeData;
+  data: ImageChallengeData // | MathChallengeData | TextChallengeData;
 }
 
 export interface CaptchaState {
@@ -37,7 +38,7 @@ export const MASTER_DATASET = [
   { id: 6, type: 'Hydrant', src: 'assets/images/captchas/Hydrant_6.png' },
   { id: 7, type: 'Hydrant', src: 'assets/images/captchas/Hydrant_7.png' },
   { id: 8, type: 'Hydrant', src: 'assets/images/captchas/Hydrant_8.png' },
-  { id: 9, type: 'Hydrant', src: 'assets/images/captchas/Hydrant_9.png' },  
+  { id: 9, type: 'Hydrant', src: 'assets/images/captchas/Hydrant_9.png' },
   { id: 10, type: 'Car', src: 'assets/images/captchas/Car_1.png' },
   { id: 11, type: 'Car', src: 'assets/images/captchas/Car_2.png' },
   { id: 12, type: 'Car', src: 'assets/images/captchas/Car_3.png' },
@@ -46,7 +47,7 @@ export const MASTER_DATASET = [
   { id: 15, type: 'Car', src: 'assets/images/captchas/Car_6.png' },
   { id: 16, type: 'Car', src: 'assets/images/captchas/Car_7.png' },
   { id: 17, type: 'Car', src: 'assets/images/captchas/Car_8.png' },
-  { id: 18, type: 'Car', src: 'assets/images/captchas/Car_9.png' }, 
+  { id: 18, type: 'Car', src: 'assets/images/captchas/Car_9.png' },
   { id: 19, type: 'Stair', src: 'assets/images/captchas/Stair_1.png' },
   { id: 20, type: 'Stair', src: 'assets/images/captchas/Stair_2.png' },
   { id: 21, type: 'Stair', src: 'assets/images/captchas/Stair_3.png' },

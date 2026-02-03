@@ -1,1 +1,23 @@
-<p>image-grid works!</p>
+<div class="row g-2 justify-content-center" style="max-width: 400px; margin: 0 auto;">
+
+  @for (item of data.items; track item.id) {
+    <div class="col-4">
+
+      <div
+        class="ratio ratio-1x1 position-relative border border-3 cursor-pointer transition-base"
+        [class.border-primary]="isSelected(item.id)"
+        [class.border-transparent]="!isSelected(item.id)"
+        (click)="toggleSelection(item.id)"
+        (keydown.enter)="toggleSelection(item.id)"
+        tabindex="0"
+        role="checkbox"
+        [attr.aria-checked]="isSelected(item.id)">
+
+        <img [src]="item.src" alt="Captcha option" class="object-fit-cover w-100 h-100">
+
+      </div>
+
+    </div>
+  }
+
+</div>

@@ -1,5 +1,10 @@
 import { computed, effect, Injectable, signal } from '@angular/core';
-import { CaptchaStage, CaptchaState, MASTER_DATASET } from '../models/captcha.types';
+import {
+  CaptchaStage,
+  CaptchaState,
+  ImageChallengeData,
+  MASTER_DATASET,
+} from '../models/captcha.types';
 
 @Injectable({
   providedIn: 'root',
@@ -19,8 +24,9 @@ export class CaptchaService {
     if (json) {
       return JSON.parse(json);
     }
+    const stages = this.generateRandomStages();
 
-    return { currentStageIndex: 0, stages: [], answers: {}, isCompleted: false };
+    return { currentStageIndex: 0, stages: stages, answers: {}, isCompleted: false };
   }
 
   constructor() {
@@ -30,13 +36,14 @@ export class CaptchaService {
   }
 
   startNewSession() {
-    const stages = this.generateRandomStages();
-    this.state.set({
-      currentStageIndex: 0,
-      stages: stages,
-      answers: {},
-      isCompleted: false
-    });
+    this.state.set(this.loadState());
+    // const stages = this.generateRandomStages();
+    // this.state.set({
+    //   currentStageIndex: 0,
+    //   stages: stages,
+    //   answers: {},
+    //   isCompleted: false,
+    // });
   }
 
   private generateRandomStages(): CaptchaStage[] {
@@ -70,7 +77,7 @@ export class CaptchaService {
         id: `stage_${i}`,
         type: 'image',
         prompt: `Select all images with ${targetType.toUpperCase()}S`,
-        data: { items: fullGrid },
+        data: { target: targetType, items: fullGrid },
       });
     }
 
@@ -80,5 +87,75 @@ export class CaptchaService {
   // Standard Fisher-Yates Shuffle
   private shuffle(array: any[]): any[] {
     return array.sort(() => Math.random() - 0.5);
+  }
+
+  /**
+   * Advances to the next stage if available.
+   */
+  nextStage() {
+    let navigate = false
+    this.state.update((s) => {
+      const nextIndex = s.currentStageIndex + 1;
+
+      // If we are out of stages, mark as completed
+      if (nextIndex >= s.stages.length) {
+        navigate = true
+        return { ...s, isCompleted: true };
+      }
+
+      return { ...s, currentStageIndex: nextIndex };
+    });
+    return navigate;
+  }
+
+  /**
+   * Moves back to the previous stage.
+   */
+  prevStage() {
+    this.state.update((s) => {
+      const prev = Math.max(0, s.currentStageIndex - 1);
+      return { ...s, currentStageIndex: prev };
+    });
+  }
+
+  checkAnswer(userSelection: string[], targetCategory: string): boolean {
+    const stage = this.currentStage();
+
+    // Safety check
+    if (!stage || stage.type !== 'image') return false;
+
+    // Retrieve the correct IDs from our internal dataset
+    // (We filter the dataset based on the Prompt's logic)
+    // const targetCategory = 'traffic_light'; // Hardcoded for this example, logic can be dynamic
+
+    // Find which IDs in the CURRENT STAGE are actually traffic lights
+    const currentStageImageIds = (stage.data as ImageChallengeData).items.map((i) => i.id);
+    const correctIds = MASTER_DATASET.filter(
+      (img) => img.type === targetCategory && currentStageImageIds.includes(img.id),
+    ).map((img) => img.id);
+
+    // Strict Validation: Must match exactly (sorted comparison)
+    const sortedUser = [...userSelection].sort();
+    const sortedCorrect = [...correctIds].sort();
+
+    const isMatch = JSON.stringify(sortedUser) === JSON.stringify(sortedCorrect);
+
+    if (isMatch) {
+      this.saveAnswer(stage.id, userSelection);
+      return true;
+    }
+    return false;
+  }
+
+  private saveAnswer(stageId: string, answer: any) {
+    this.state.update((s) => ({
+      ...s,
+      answers: { ...s.answers, [stageId]: answer },
+    }));
+  }
+
+  reset() {
+    localStorage.removeItem('angul_it_state');
+    this.startNewSession();
   }
 }
