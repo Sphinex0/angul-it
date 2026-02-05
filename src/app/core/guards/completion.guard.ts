@@ -1,11 +1,12 @@
+import { inject } from '@angular/core';
 import { CanActivateFn } from '@angular/router';
 import { CaptchaService } from '../services/captcha.service';
-import { inject } from '@angular/core';
 
 export const completionGuard: CanActivateFn = (route, state) => {
-    const captchaService = inject(CaptchaService);
-    if (!captchaService.isFinished()) {
-        return false;
-    }
-  return true;
+  const service = inject(CaptchaService);
+  if (service.isFinished()) {
+    return true;
+  } else {
+    return false;
+  }
 };
