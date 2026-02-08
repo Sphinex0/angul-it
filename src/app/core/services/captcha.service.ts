@@ -6,7 +6,8 @@ import {
   GRID_DATASET,
   TextChallengeData,
   TEXT_DATASET,
-} from '../models/captcha.types';
+  SliderChallengeData,
+} from './../models/captcha.types';
 
 @Injectable({
   providedIn: 'root',
@@ -59,8 +60,7 @@ export class CaptchaService {
   private generateRandomStages(): CaptchaStage[] {
     const challenges: CaptchaStage[] = [];
     const totalStages = 3;
-    const possibleStages = ['image', 'text']; //, 'slide'
-
+    const possibleStages = ['image', 'text', 'slide'];
 
     for (let i = 0; i < totalStages; i++) {
       const targetType = possibleStages[Math.floor(Math.random() * possibleStages.length)];
@@ -73,7 +73,7 @@ export class CaptchaService {
           challenges.push(this.generateTextStage(i));
           break;
         case 'slide':
-          // challenges.push(this.generateSlideStage(i));
+          challenges.push(this.generateSlideStage(i));
           break;
         default:
           break;
@@ -83,18 +83,31 @@ export class CaptchaService {
     return challenges;
   }
 
-  private generateTextStage(i:number) : CaptchaStage {
-    const stage_data = TEXT_DATASET[Math.floor(Math.random() * TEXT_DATASET.length)]
-   return {
-        id: `stage_${i}`,
-        type: 'text',
-        prompt: `Type the text in the image:`,
-        data: stage_data,
-      };
-
+  private generateSlideStage(i: number): CaptchaStage {
+    const stage_data: SliderChallengeData = {
+      target: "" + Math.floor(Math.random() * 140) + 100,
+      src: GRID_DATASET[Math.floor(Math.random() * TEXT_DATASET.length)].src,
+    };
+    return {
+      id: `stage_${i}`,
+      type: 'slide',
+      prompt: `Slide the piece into the right position:`,
+      data: stage_data,
+    };
   }
 
-  private generateImageStage(i:number) : CaptchaStage {
+  private generateTextStage(i: number): CaptchaStage {
+    const stage_data: TextChallengeData =
+      TEXT_DATASET[Math.floor(Math.random() * TEXT_DATASET.length)];
+    return {
+      id: `stage_${i}`,
+      type: 'text',
+      prompt: `Type the text in the image:`,
+      data: stage_data,
+    };
+  }
+
+  private generateImageStage(i: number): CaptchaStage {
     const possibleTasks = ['Hydrant', 'Stair', 'Car'];
 
     const targetType = possibleTasks[Math.floor(Math.random() * possibleTasks.length)];
@@ -110,11 +123,11 @@ export class CaptchaService {
     const selectedWrong = this.shuffle(wrongImages).slice(0, 6);
     const fullGrid = this.shuffle([...selectedCorrect, ...selectedWrong]);
     return {
-        id: `stage_${i}`,
-        type: 'image',
-        prompt: `Select all images with ${targetType.toUpperCase()}S`,
-        data: { target: targetType, items: fullGrid },
-      }
+      id: `stage_${i}`,
+      type: 'image',
+      prompt: `Select all images with ${targetType.toUpperCase()}S`,
+      data: { target: targetType, items: fullGrid },
+    };
   }
 
   // Standard Fisher-Yates Shuffle
@@ -145,7 +158,7 @@ export class CaptchaService {
     });
   }
 
-  checkAnswer(userSelection: string[], targetCategory: string): boolean {
+  checkAnswer(userSelection: string[] | string, targetCategory: string): boolean {
     const stage = this.currentStage();
 
     // Safety check
@@ -153,21 +166,37 @@ export class CaptchaService {
 
     switch (stage.type) {
       case 'image':
+        if (typeof userSelection === 'string') {
+          return false;
+        }
         return this.checkGrid(userSelection, targetCategory, stage);
       case 'text':
-        return this.checkText(targetCategory, stage);
+        if (typeof userSelection !== 'string') {
+          return false;
+        }
+        return this.checkText(userSelection, targetCategory, stage);
 
       case 'slide':
-        return false;
+        if (userSelection !== 'true' && userSelection !== 'false') {
+          return false;
+        }
+        return userSelection === 'true';
 
       default:
         return false;
     }
   }
 
-  checkText(target: string, stage: CaptchaStage) {
-    const stageData = stage.data as TextChallengeData;
-    if (stageData.target === target) {
+  checkSlide(userSelection: string, target: string, stage: CaptchaStage) {
+    if (userSelection === target) {
+      this.saveAnswer(stage.id, target);
+      return true;
+    }
+    return false;
+  }
+
+  checkText(userSelection: string, target: string, stage: CaptchaStage) {
+    if (userSelection === target) {
       this.saveAnswer(stage.id, target);
       return true;
     }

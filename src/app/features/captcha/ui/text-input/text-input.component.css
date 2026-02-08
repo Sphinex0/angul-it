@@ -1,0 +1,9 @@
+.letter-spacing-2 {
+  letter-spacing: 2px;
+  font-family: 'Courier New', Courier, monospace; 
+}
+
+/* Optional: Add a subtle 'noise' background to the image container */
+.bg-light {
+  background-image: url('data:image/svg+xml,...');
+}

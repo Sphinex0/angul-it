@@ -1,0 +1,13 @@
+
+input[type=range] {
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+svg {
+  overflow: hidden;
+  border-radius: 4px;
+}

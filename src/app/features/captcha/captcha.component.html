@@ -34,12 +34,20 @@
                 </app-image-grid>
               }
               @case ('text') {
-                <!-- <app-text-input
+                <app-text-input
                   [data]="stage.data"
                   [initialAnswer]="currentAnswer() || ''"
                   (answerChange)="onSelectionChange($event)"
                 >
-                </app-text-input> -->
+                </app-text-input>
+              }
+              @case ('slide') {
+                <app-slider-captcha
+                  [data]="stage.data"
+                  (answerChange)="onSelectionChange($event)"
+                >
+                </app-slider-captcha>
+                <!-- [initialAnswer]="currentAnswer() || ''" -->
               }
             }
           }

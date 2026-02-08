@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
+import { CaptchaService } from '../services/captcha.service';
 
-import { CaptchaService } from './captcha.types';
 
 describe('CaptchaService', () => {
   let service: CaptchaService;

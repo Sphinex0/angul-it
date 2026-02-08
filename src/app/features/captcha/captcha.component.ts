@@ -3,10 +3,11 @@ import { CaptchaService } from '../../core/services/captcha.service';
 import { ImageGridComponent } from './ui/image-grid/image-grid.component';
 import { Router } from '@angular/router';
 import { TextInputComponent } from './ui/text-input/text-input.component';
+import { SliderCaptchaComponent } from "./ui/slider-captcha/slider-captcha.component";
 
 @Component({
   selector: 'app-captcha',
-  imports: [ImageGridComponent, TextInputComponent],
+  imports: [ImageGridComponent, TextInputComponent, SliderCaptchaComponent],
   templateUrl: './captcha.component.html',
   styleUrl: './captcha.component.css',
 })
@@ -19,7 +20,7 @@ export class CaptchaComponent {
 
   currentAnswer = this.captchaService.currentAnswer;
 
-  currentSelection: string[] = this.currentAnswer() || [];
+  currentSelection: string[] | string= this.currentAnswer() || [];
   isStageValid = this.currentSelection.length > 0;
 
   constructor() {
@@ -30,10 +31,17 @@ export class CaptchaComponent {
     // console.log(this.captchaService.allStages());
   }
 
-  onSelectionChange(selectedIds: string[]) {
-    this.currentSelection = selectedIds;
-    // Simple UI validation: Button only enables if they selected SOMETHING
+  onSelectionChange(selectedIds: string[] | string) {
+    if (typeof selectedIds === 'string') {
+      this.currentSelection = selectedIds;
+    this.isStageValid = selectedIds.length >= 3;
+
+    }else{
+      this.currentSelection = selectedIds;
     this.isStageValid = selectedIds.length > 0;
+
+    }
+
   }
 
   handleNext() {

@@ -4,10 +4,9 @@ import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-text-input',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, NgOptimizedImage], // Import ReactiveFormsModule
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './text-input.component.html',
-  styleUrl: './text-input.component.scss'
+  styleUrl: './text-input.component.css'
 })
 export class TextInputComponent implements OnChanges {
   @Input({ required: true }) data: any;
@@ -31,7 +30,6 @@ export class TextInputComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['initialAnswer']) {
-      // Update the form control without emitting an event (to avoid loops)
       this.inputControl.setValue(this.initialAnswer || '', { emitEvent: false });
     }
   }

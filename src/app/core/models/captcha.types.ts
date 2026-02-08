@@ -10,6 +10,11 @@ export interface MathChallengeData {
   equation: string;
 }
 
+export interface SliderChallengeData {
+  target: string;
+  src: string; // Just one image!
+}
+
 export interface TextChallengeData {
   src: string;
   target: string;
@@ -19,7 +24,7 @@ export interface CaptchaStage {
   id: string;
   type: 'image' | 'slide' | 'text';
   prompt: string;
-  data: ImageChallengeData | TextChallengeData; // | MathChallengeData ;
+  data: ImageChallengeData | TextChallengeData | SliderChallengeData; // | MathChallengeData ;
 }
 
 export interface CaptchaState {
@@ -62,15 +67,15 @@ export const GRID_DATASET = [
 ];
 
 export const TEXT_DATASET = [
-  { target: 'vgxrub', src: 'assets/images/captchas/text/0_vgxrub.jpeg' },
-  { target: 'ne2bt2', src: 'assets/images/captchas/text/1_ne2bt2.jpeg' },
-  { target: 'tdk6mf', src: 'assets/images/captchas/text/2_tdk6mf.jpeg' },
-  { target: 'hvpvkx', src: 'assets/images/captchas/text/3_hvpvkx.jpeg' },
-  { target: '6dmens', src: 'assets/images/captchas/text/4_6dmens.jpeg' },
-  { target: 'hdebpv', src: 'assets/images/captchas/text/5_hdebpv.jpeg' },
-  { target: 'anphkb', src: 'assets/images/captchas/text/6_anphkb.jpeg' },
-  { target: 'vvvesr', src: 'assets/images/captchas/text/7_vvvesr.jpeg' },
-  { target: 'gmau6u', src: 'assets/images/captchas/text/8_gmau6u.jpeg' },
-  { target: 'epe6en', src: 'assets/images/captchas/text/9_epe6en.jpeg' },
-  { target: '6nst2a', src: 'assets/images/captchas/text/10_6nst2a.jpeg' },
+  { target: 'vgxrub'.toUpperCase(), src: 'assets/images/captchas/text/0_vgxrub.jpeg' },
+  { target: 'ne2bt2'.toUpperCase(), src: 'assets/images/captchas/text/1_ne2bt2.jpeg' },
+  { target: 'tdk6mf'.toUpperCase(), src: 'assets/images/captchas/text/2_tdk6mf.jpeg' },
+  { target: 'hvpvkx'.toUpperCase(), src: 'assets/images/captchas/text/3_hvpvkx.jpeg' },
+  { target: '6dmens'.toUpperCase(), src: 'assets/images/captchas/text/4_6dmens.jpeg' },
+  { target: 'hdebpv'.toUpperCase(), src: 'assets/images/captchas/text/5_hdebpv.jpeg' },
+  { target: 'anphkb'.toUpperCase(), src: 'assets/images/captchas/text/6_anphkb.jpeg' },
+  { target: 'vvvesr'.toUpperCase(), src: 'assets/images/captchas/text/7_vvvesr.jpeg' },
+  { target: 'gmau6u'.toUpperCase(), src: 'assets/images/captchas/text/8_gmau6u.jpeg' },
+  { target: 'epe6en'.toUpperCase(), src: 'assets/images/captchas/text/9_epe6en.jpeg' },
+  { target: '6nst2a'.toUpperCase(), src: 'assets/images/captchas/text/10_6nst2a.jpeg' },
 ];
