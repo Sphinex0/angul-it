@@ -1,48 +1,66 @@
-import { Component, Input, Output, EventEmitter, OnInit, signal, computed } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, signal, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormControl, ReactiveFormsModule } from '@angular/forms'; // 1. Import ReactiveFormsModule
 
 @Component({
   selector: 'app-slider-captcha',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule], // 2. Add to imports
   templateUrl: './slider-captcha.component.html',
   styleUrl: './slider-captcha.component.css'
 })
-export class SliderCaptchaComponent implements OnInit {
+export class SliderCaptchaComponent implements OnChanges {
   @Input({ required: true }) data: any;
   @Output() answerChange = new EventEmitter<string>();
+  @Input() initialAnswer: string = '125';
 
-  // State
-  sliderValue = signal<number>(0); // 0 to 240 (Width - PieceWidth)
 
-  // Puzzle State (In SVG Coordinates 300x150)
-  targetX = signal<number>(0);
-  targetY = signal<number>(0);
+  // 3. The Control
+  sliderControl = new FormControl(0, { nonNullable: true });
 
-  // A generic "Puzzle Piece" shape path
-  // This draws a square with a bump on the right and a notch on the top
+  // 4. Visual State (Signal for performance)
+  sliderValue = signal<number>(0);
+
+  // Puzzle State
+  targetX = signal<number>(+this.initialAnswer);
+  targetY = signal<number>(40);
+
+  // The SVG Path
   readonly puzzlePath = "M 10 0 L 30 0 C 30 0 30 10 40 10 C 50 10 50 0 50 0 L 70 0 L 70 30 L 60 30 C 60 30 50 30 50 40 C 50 50 60 50 60 50 L 70 50 L 70 70 L 10 70 L 10 0 Z";
 
-  ngOnInit() {
-    this.generateRandomPuzzle();
+  constructor() {
+    // 5. Sync Control -> Signal
+    // This ensures the SVG updates smoothly while dragging
+    this.sliderControl.valueChanges.subscribe(val => {
+      this.sliderValue.set(val);
+    });
+  }
+
+  // ngOnInit() {
+  //   this.generateRandomPuzzle();
+  // }
+    ngOnChanges() {
+    // if (changes['initialAnswer']) {
+      this.sliderControl.setValue(+this.initialAnswer || 50);
+    // }
   }
 
   generateRandomPuzzle() {
-    // Random X between 100 and 240 (keep it on the right side)
-    const x = Math.floor(Math.random() * 140) + 100;
-    this.targetX.set(x);
-
-    // Random Y between 10 and 80 (keep it vertical safe)
-    const y = Math.floor(Math.random() * 70) + 10;
-    this.targetY.set(y);
+    // X: Keep piece inside the right side (100-240)
+    this.targetX.set(Math.floor(Math.random() * 140) + 100);
+    // Y: Keep piece vertical safe (10-80)
+    this.targetY.set(Math.floor(Math.random() * 70) + 10);
   }
 
+  // 6. Called only when user RELEASES the slider
   onRelease() {
-    // Check if user is close (Tolerance of 5 units)
-    const diff = Math.abs(this.sliderValue() - this.targetX());
-    const answer = diff < 50 ? "true": "false"
-    console.log(diff);
-    this.answerChange.emit(answer);
+    const currentVal = this.sliderControl.value;
+    const targetVal = this.targetX();
+
+    // Check tolerance (+/- 5 units)
+    const diff = Math.abs(currentVal - targetVal);
+    const isSuccess: string = diff < 5 ? 'true' : 'false';
+
+    this.answerChange.emit(isSuccess);
   }
 }

@@ -223,7 +223,7 @@ export class CaptchaService {
     return false;
   }
 
-  private saveAnswer(stageId: string, answer: any) {
+  public saveAnswer(stageId: string, answer: any) {
     this.state.update((s) => ({
       ...s,
       answers: { ...s.answers, [stageId]: answer },

@@ -32,6 +32,8 @@ export class CaptchaComponent {
   }
 
   onSelectionChange(selectedIds: string[] | string) {
+    this.captchaService.saveAnswer(this.captchaService.currentStage().id, selectedIds);
+
     if (typeof selectedIds === 'string') {
       this.currentSelection = selectedIds;
     this.isStageValid = selectedIds.length >= 3;

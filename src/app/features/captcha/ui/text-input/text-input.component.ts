@@ -29,8 +29,8 @@ export class TextInputComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['initialAnswer']) {
+    // if (changes['initialAnswer']) {
       this.inputControl.setValue(this.initialAnswer || '', { emitEvent: false });
-    }
+    // }
   }
 }
