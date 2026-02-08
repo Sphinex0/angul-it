@@ -10,8 +10,9 @@
     <p class="lead text-muted mb-4">
       You have successfully proven you are human.
       <br>
-      <span class="small">(And passed the Audit!)</span>
+      <span class="small">You took: {{ (duration() / 1000)}} seconds</span>
     </p>
+
 
     <button (click)="restart()" class="btn btn-outline-success btn-lg">
       Verify Another Session

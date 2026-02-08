@@ -2,10 +2,11 @@ import { Component, inject } from '@angular/core';
 import { CaptchaService } from '../../core/services/captcha.service';
 import { ImageGridComponent } from './ui/image-grid/image-grid.component';
 import { Router } from '@angular/router';
+import { TextInputComponent } from './ui/text-input/text-input.component';
 
 @Component({
   selector: 'app-captcha',
-  imports: [ImageGridComponent],
+  imports: [ImageGridComponent, TextInputComponent],
   templateUrl: './captcha.component.html',
   styleUrl: './captcha.component.css',
 })
@@ -25,7 +26,7 @@ export class CaptchaComponent {
     if (!this.currentStage()) {
       this.router.navigate(['/']);
     }
-    this.captchaService.startNewSession();
+    this.captchaService.loadState();
     // console.log(this.captchaService.allStages());
   }
 
@@ -43,21 +44,15 @@ export class CaptchaComponent {
     );
 
     if (isCorrect) {
-      // 2. If correct, move to next
-      const navigate  = this.captchaService.nextStage();
+      this.captchaService.nextStage();
       this.resetUI();
 
-      // 3. Check if we just finished the last one
-      console.log("eeeeeeeeeee")
-      console.log(this.captchaService.allStages());
-      console.log(this.currentStageIndex());
-      if (navigate) {
+
+      if (this.captchaService.isFinished()) {
         this.router.navigate(['/result']);
       }
     } else {
-      // 4. If wrong, show error (Shake animation or Alert)
       alert('Verification failed. Please try again.');
-      // In a real app, you might generate a NEW challenge here.
     }
   }
 

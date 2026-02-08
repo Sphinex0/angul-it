@@ -1,1 +1,31 @@
-<p>text-input works!</p>
+<div class="text-center" style="max-width: 400px; margin: 0 auto;">
+
+  <div class="card mb-3 shadow-sm">
+    <div class="card-body p-2 bg-light d-flex justify-content-center align-items-center">
+      <img [src]="data.imageSrc" alt="Type the characters you see" class="img-fluid rounded" style="max-height: 100px;">
+    </div>
+  </div>
+
+  <div class="form-floating mb-3">
+    <input
+      type="text"
+      class="form-control form-control-lg text-center fw-bold letter-spacing-2"
+      id="captchaInput"
+      placeholder="Type here"
+      [formControl]="inputControl"
+      autocomplete="off"
+      [class.is-invalid]="inputControl.invalid && inputControl.touched">
+
+    <label for="captchaInput">Enter characters</label>
+
+    @if (inputControl.invalid && inputControl.touched) {
+      <div class="invalid-feedback">
+        Please enter the text shown above.
+      </div>
+    }
+  </div>
+
+  <p class="text-muted small">
+    <i class="bi bi-info-circle me-1"></i> Case sensitivity depends on the challenge.
+  </p>
+</div>

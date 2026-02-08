@@ -3,14 +3,16 @@ import {
   CaptchaStage,
   CaptchaState,
   ImageChallengeData,
-  MASTER_DATASET,
+  GRID_DATASET,
+  TextChallengeData,
+  TEXT_DATASET,
 } from '../models/captcha.types';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CaptchaService {
-  private state = signal<CaptchaState>(this.loadState());
+  public state = signal<CaptchaState>(this.loadState());
 
   readonly currentStageIndex = computed(() => this.state().currentStageIndex);
   readonly allStages = computed(() => this.state().stages);
@@ -19,14 +21,21 @@ export class CaptchaService {
 
   readonly currentAnswer = computed(() => this.state().answers[this.currentStage()?.id] || null);
 
-  private loadState(): CaptchaState {
+  public loadState(): CaptchaState {
     const json = localStorage.getItem('angul_it_state');
     if (json) {
       return JSON.parse(json);
     }
     const stages = this.generateRandomStages();
 
-    return { currentStageIndex: 0, stages: stages, answers: {}, isCompleted: false };
+    return {
+      currentStageIndex: 0,
+      stages: stages,
+      answers: {},
+      isCompleted: false,
+      startTime: Date.now(),
+      endTime: undefined,
+    };
   }
 
   constructor() {
@@ -36,52 +45,76 @@ export class CaptchaService {
   }
 
   startNewSession() {
-    this.state.set(this.loadState());
-    // const stages = this.generateRandomStages();
-    // this.state.set({
-    //   currentStageIndex: 0,
-    //   stages: stages,
-    //   answers: {},
-    //   isCompleted: false,
-    // });
+    const stages = this.generateRandomStages();
+    this.state.set({
+      currentStageIndex: 0,
+      stages: stages,
+      answers: {},
+      isCompleted: false,
+      startTime: Date.now(),
+      endTime: undefined,
+    });
   }
 
   private generateRandomStages(): CaptchaStage[] {
     const challenges: CaptchaStage[] = [];
-    const totalStages = 3; // How many levels user must pass
+    const totalStages = 3;
+    const possibleStages = ['image', 'text']; //, 'slide'
 
-    // 1. Define possible tasks
-    const possibleTasks = ['Hydrant', 'Stair', 'Car'];
 
     for (let i = 0; i < totalStages; i++) {
-      // 2. Pick a random target (e.g., 'cat')
-      const targetType = possibleTasks[Math.floor(Math.random() * possibleTasks.length)];
+      const targetType = possibleStages[Math.floor(Math.random() * possibleStages.length)];
 
-      // 3. Filter the pool
-      const correctImages = MASTER_DATASET.filter((img) => img.type === targetType);
-      const wrongImages = MASTER_DATASET.filter((img) => img.type !== targetType);
-
-      // 4. Safety Check: Do we have enough images?
-      if (correctImages.length < 3) {
-        console.error(`Not enough ${targetType} images!`);
-        continue;
+      switch (targetType) {
+        case 'image':
+          challenges.push(this.generateImageStage(i));
+          break;
+        case 'text':
+          challenges.push(this.generateTextStage(i));
+          break;
+        case 'slide':
+          // challenges.push(this.generateSlideStage(i));
+          break;
+        default:
+          break;
       }
+    }
 
-      // 5. Build the Grid (e.g., 3 Correct + 6 Wrong)
-      // Helper function 'shuffle' (Fisher-Yates) needed here
-      const selectedCorrect = this.shuffle(correctImages).slice(0, 3);
-      const selectedWrong = this.shuffle(wrongImages).slice(0, 6);
-      const fullGrid = this.shuffle([...selectedCorrect, ...selectedWrong]);
+    return challenges;
+  }
 
-      challenges.push({
+  private generateTextStage(i:number) : CaptchaStage {
+    const stage_data = TEXT_DATASET[Math.floor(Math.random() * TEXT_DATASET.length)]
+   return {
+        id: `stage_${i}`,
+        type: 'text',
+        prompt: `Type the text in the image:`,
+        data: stage_data,
+      };
+
+  }
+
+  private generateImageStage(i:number) : CaptchaStage {
+    const possibleTasks = ['Hydrant', 'Stair', 'Car'];
+
+    const targetType = possibleTasks[Math.floor(Math.random() * possibleTasks.length)];
+
+    const correctImages = GRID_DATASET.filter((img) => img.type === targetType);
+    const wrongImages = GRID_DATASET.filter((img) => img.type !== targetType);
+
+    if (correctImages.length < 3) {
+      console.error(`Not enough ${targetType} images!`);
+    }
+
+    const selectedCorrect = this.shuffle(correctImages).slice(0, 3);
+    const selectedWrong = this.shuffle(wrongImages).slice(0, 6);
+    const fullGrid = this.shuffle([...selectedCorrect, ...selectedWrong]);
+    return {
         id: `stage_${i}`,
         type: 'image',
         prompt: `Select all images with ${targetType.toUpperCase()}S`,
         data: { target: targetType, items: fullGrid },
-      });
-    }
-
-    return challenges;
+      }
   }
 
   // Standard Fisher-Yates Shuffle
@@ -89,23 +122,17 @@ export class CaptchaService {
     return array.sort(() => Math.random() - 0.5);
   }
 
-  /**
-   * Advances to the next stage if available.
-   */
   nextStage() {
-    let navigate = false
     this.state.update((s) => {
       const nextIndex = s.currentStageIndex + 1;
 
       // If we are out of stages, mark as completed
       if (nextIndex >= s.stages.length) {
-        navigate = true
-        return { ...s, isCompleted: true };
+        return { ...s, isCompleted: true, endTime: Date.now() };
       }
 
       return { ...s, currentStageIndex: nextIndex };
     });
-    return navigate;
   }
 
   /**
@@ -122,19 +149,39 @@ export class CaptchaService {
     const stage = this.currentStage();
 
     // Safety check
-    if (!stage || stage.type !== 'image') return false;
+    if (!stage) return false;
 
-    // Retrieve the correct IDs from our internal dataset
-    // (We filter the dataset based on the Prompt's logic)
-    // const targetCategory = 'traffic_light'; // Hardcoded for this example, logic can be dynamic
+    switch (stage.type) {
+      case 'image':
+        return this.checkGrid(userSelection, targetCategory, stage);
+      case 'text':
+        return this.checkText(targetCategory, stage);
 
-    // Find which IDs in the CURRENT STAGE are actually traffic lights
-    const currentStageImageIds = (stage.data as ImageChallengeData).items.map((i) => i.id);
-    const correctIds = MASTER_DATASET.filter(
+      case 'slide':
+        return false;
+
+      default:
+        return false;
+    }
+  }
+
+  checkText(target: string, stage: CaptchaStage) {
+    const stageData = stage.data as TextChallengeData;
+    if (stageData.target === target) {
+      this.saveAnswer(stage.id, target);
+      return true;
+    }
+    return false;
+  }
+
+  checkGrid(userSelection: string[], targetCategory: string, stage: CaptchaStage) {
+    const stageData = stage.data as ImageChallengeData;
+
+    const currentStageImageIds = stageData.items.map((i) => i.id);
+    const correctIds = GRID_DATASET.filter(
       (img) => img.type === targetCategory && currentStageImageIds.includes(img.id),
     ).map((img) => img.id);
 
-    // Strict Validation: Must match exactly (sorted comparison)
     const sortedUser = [...userSelection].sort();
     const sortedCorrect = [...correctIds].sort();
 
