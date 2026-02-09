@@ -12,17 +12,17 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms'; // 1. Import 
 export class SliderCaptchaComponent implements OnChanges {
   @Input({ required: true }) data: any;
   @Output() answerChange = new EventEmitter<string>();
-  @Input() initialAnswer: string = '125';
+  @Input() initialAnswer: string = '';
 
 
   // 3. The Control
   sliderControl = new FormControl(0, { nonNullable: true });
 
   // 4. Visual State (Signal for performance)
-  sliderValue = signal<number>(0);
+  sliderValue = signal<number>(+this.initialAnswer || 0);
 
   // Puzzle State
-  targetX = signal<number>(+this.initialAnswer);
+  targetX = signal<number>(0);
   targetY = signal<number>(40);
 
   // The SVG Path
@@ -36,31 +36,21 @@ export class SliderCaptchaComponent implements OnChanges {
     });
   }
 
-  // ngOnInit() {
-  //   this.generateRandomPuzzle();
-  // }
+  ngOnInit() {
+    this.targetX.set(+this.data.target)
+    console.log(this.data)
+  }
     ngOnChanges() {
-    // if (changes['initialAnswer']) {
+    // if (changes['initialAnswer'])
       this.sliderControl.setValue(+this.initialAnswer || 50);
     // }
   }
 
-  generateRandomPuzzle() {
-    // X: Keep piece inside the right side (100-240)
-    this.targetX.set(Math.floor(Math.random() * 140) + 100);
-    // Y: Keep piece vertical safe (10-80)
-    this.targetY.set(Math.floor(Math.random() * 70) + 10);
-  }
 
   // 6. Called only when user RELEASES the slider
   onRelease() {
     const currentVal = this.sliderControl.value;
-    const targetVal = this.targetX();
 
-    // Check tolerance (+/- 5 units)
-    const diff = Math.abs(currentVal - targetVal);
-    const isSuccess: string = diff < 5 ? 'true' : 'false';
-
-    this.answerChange.emit(isSuccess);
+    this.answerChange.emit(currentVal.toString());
   }
 }

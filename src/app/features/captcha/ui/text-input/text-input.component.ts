@@ -12,25 +12,20 @@ export class TextInputComponent implements OnChanges {
   @Input({ required: true }) data: any;
   @Input() initialAnswer: string = '';
 
-  // Output the raw value (string) to the parent
   @Output() answerChange = new EventEmitter<string>();
 
-  // Create a FormControl with validation (e.g., required, min length)
   inputControl = new FormControl('', [
     Validators.required,
-    Validators.minLength(3) // Example: text must be 3+ chars
+    Validators.minLength(3)
   ]);
 
   constructor() {
-    // Listen to value changes and emit to parent
     this.inputControl.valueChanges.subscribe(value => {
       this.answerChange.emit(value || '');
     });
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    // if (changes['initialAnswer']) {
       this.inputControl.setValue(this.initialAnswer || '', { emitEvent: false });
-    // }
   }
 }

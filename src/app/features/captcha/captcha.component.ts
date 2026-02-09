@@ -36,7 +36,7 @@ export class CaptchaComponent {
 
     if (typeof selectedIds === 'string') {
       this.currentSelection = selectedIds;
-    this.isStageValid = selectedIds.length >= 3;
+    this.isStageValid = selectedIds.length >= 1;
 
     }else{
       this.currentSelection = selectedIds;

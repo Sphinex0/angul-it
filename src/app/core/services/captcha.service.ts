@@ -84,8 +84,9 @@ export class CaptchaService {
   }
 
   private generateSlideStage(i: number): CaptchaStage {
+    let random_target = Math.floor(Math.random() * 140) + 100
     const stage_data: SliderChallengeData = {
-      target: "" + Math.floor(Math.random() * 140) + 100,
+      target: (random_target).toString(),
       src: GRID_DATASET[Math.floor(Math.random() * TEXT_DATASET.length)].src,
     };
     return {
@@ -177,10 +178,11 @@ export class CaptchaService {
         return this.checkText(userSelection, targetCategory, stage);
 
       case 'slide':
-        if (userSelection !== 'true' && userSelection !== 'false') {
+        if (typeof userSelection !== 'string') {
           return false;
         }
-        return userSelection === 'true';
+
+        return this.checkSlide(userSelection, targetCategory, stage);
 
       default:
         return false;
@@ -188,10 +190,13 @@ export class CaptchaService {
   }
 
   checkSlide(userSelection: string, target: string, stage: CaptchaStage) {
-    if (userSelection === target) {
+    const diff = Math.abs(+userSelection - +target);
+    const isSuccess: boolean = diff < 5 ;
+    if (isSuccess) {
       this.saveAnswer(stage.id, target);
       return true;
     }
+
     return false;
   }
 
