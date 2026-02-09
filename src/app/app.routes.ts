@@ -17,8 +17,13 @@ export const routes: Routes = [
   {
     path: 'result',
     loadComponent: () => import('./features/result/result.component').then(m => m.ResultComponent),
-    canActivate: [completionGuard], 
+    canActivate: [completionGuard],
     title: 'Angul-It | Success'
   },
-  { path: '**', redirectTo: '' }
+  {
+    path: '404',
+    loadComponent: () => import('./features/not-found/not-found.component').then(m => m.NotFoundComponent),
+    title: 'Angul-It | Not Found'
+  },
+  { path: '**', redirectTo: '404' }
 ];

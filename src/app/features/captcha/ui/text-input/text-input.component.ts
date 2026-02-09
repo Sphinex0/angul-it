@@ -1,10 +1,9 @@
 import { Component, input, output, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-text-input',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './text-input.component.html',
   styleUrl: './text-input.component.css'
 })

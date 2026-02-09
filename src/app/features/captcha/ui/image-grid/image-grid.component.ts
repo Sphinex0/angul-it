@@ -1,10 +1,7 @@
 import { Component, input, output, signal, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-image-grid',
-  standalone: true,
-  imports: [CommonModule],
   templateUrl: './image-grid.component.html',
   styleUrl: './image-grid.component.css'
 })

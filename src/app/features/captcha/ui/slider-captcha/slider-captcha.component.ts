@@ -1,11 +1,9 @@
 import { Component, input, output, signal, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-slider-captcha',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './slider-captcha.component.html',
   styleUrl: './slider-captcha.component.css',
 })

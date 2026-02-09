@@ -4,8 +4,6 @@ import { CaptchaService } from '../../core/services/captcha.service';
 
 @Component({
   selector: 'app-result',
-  standalone: true,
-  imports: [],
   templateUrl: './result.component.html',
   styleUrl: './result.component.css'
 })
