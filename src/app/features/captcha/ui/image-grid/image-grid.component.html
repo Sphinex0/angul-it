@@ -1,23 +1,26 @@
-<div class="row g-2 justify-content-center" style="max-width: 400px; margin: 0 auto;">
-
-  @for (item of data.items; track item.id) {
+<div class="row g-3 justify-content-center" style="max-width: 500px; margin: 0 auto">
+  @for (item of data().items; track item.id) {
     <div class="col-4">
-
       <div
-        class="ratio ratio-1x1 position-relative border border-3 cursor-pointer transition-base"
-        [class.border-primary]="isSelected(item.id)"
-        [class.border-transparent]="!isSelected(item.id)"
+        class="image-card rounded-2 overflow-hidden cursor-pointer position-relative"
+        [class.selected]="isSelected(item.id)"
         (click)="toggleSelection(item.id)"
         (keydown.enter)="toggleSelection(item.id)"
+        (keydown.space)="toggleSelection(item.id)"
         tabindex="0"
         role="checkbox"
-        [attr.aria-checked]="isSelected(item.id)">
-
-        <img [src]="item.src" alt="Captcha option" class="object-fit-cover w-100 h-100">
-
+        [attr.aria-checked]="isSelected(item.id)"
+      >
+        <img [src]="item.src" alt="Select option" class="w-100 h-100 object-fit-cover" />
+        <div class="overlay"></div>
+        @if (isSelected(item.id)) {
+          <div class="checkmark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+          </div>
+        }
       </div>
-
     </div>
   }
-
 </div>

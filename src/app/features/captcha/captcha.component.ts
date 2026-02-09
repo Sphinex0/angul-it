@@ -1,9 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal, effect } from '@angular/core';
 import { CaptchaService } from '../../core/services/captcha.service';
 import { ImageGridComponent } from './ui/image-grid/image-grid.component';
 import { Router } from '@angular/router';
 import { TextInputComponent } from './ui/text-input/text-input.component';
-import { SliderCaptchaComponent } from "./ui/slider-captcha/slider-captcha.component";
+import { SliderCaptchaComponent } from './ui/slider-captcha/slider-captcha.component';
 
 @Component({
   selector: 'app-captcha',
@@ -12,51 +12,50 @@ import { SliderCaptchaComponent } from "./ui/slider-captcha/slider-captcha.compo
   styleUrl: './captcha.component.css',
 })
 export class CaptchaComponent {
-  captchaService = inject(CaptchaService);
-  private router = inject(Router);
+  private readonly captchaService = inject(CaptchaService);
+  private readonly router = inject(Router);
 
-  currentStage = this.captchaService.currentStage;
-  currentStageIndex = this.captchaService.currentStageIndex;
+  readonly currentStage = this.captchaService.currentStage;
+  readonly currentStageIndex = this.captchaService.currentStageIndex;
+  readonly currentAnswer = this.captchaService.currentAnswer;
 
-  currentAnswer = this.captchaService.currentAnswer;
-
-  currentSelection: string[] | string= this.currentAnswer() || [];
-  isStageValid = this.currentSelection.length > 0;
+  private readonly currentSelection = signal<string[] | string>([]);
+  private readonly isStageValid = signal<boolean>(false);
 
   constructor() {
-    if (!this.currentStage()) {
-      this.router.navigate(['/']);
-    }
     this.captchaService.loadState();
-    // console.log(this.captchaService.allStages());
+
+    effect(() => {
+      if (!this.currentStage()) {
+        this.router.navigate(['/']);
+      }
+      this.updateValidation();
+    });
+  }
+
+  protected get selection() {
+    return this.currentSelection();
+  }
+
+  protected get isValid() {
+    return this.isStageValid();
   }
 
   onSelectionChange(selectedIds: string[] | string) {
-    this.captchaService.saveAnswer(this.captchaService.currentStage().id, selectedIds);
-
-    if (typeof selectedIds === 'string') {
-      this.currentSelection = selectedIds;
-    this.isStageValid = selectedIds.length >= 1;
-
-    }else{
-      this.currentSelection = selectedIds;
-    this.isStageValid = selectedIds.length > 0;
-
-    }
-
+    this.currentSelection.set(selectedIds);
+    this.captchaService.saveAnswer(this.currentStage().id, selectedIds);
+    this.updateValidation();
   }
 
   handleNext() {
-    // 1. Ask Service to validate the logic
     const isCorrect = this.captchaService.checkAnswer(
-      this.currentSelection,
+      this.currentSelection(),
       this.currentStage().data.target,
     );
 
     if (isCorrect) {
       this.captchaService.nextStage();
       this.resetUI();
-
 
       if (this.captchaService.isFinished()) {
         this.router.navigate(['/result']);
@@ -68,12 +67,17 @@ export class CaptchaComponent {
 
   handlePrev() {
     this.captchaService.prevStage();
-    this.currentSelection = this.currentAnswer() || [];
-    this.isStageValid = this.currentSelection.length > 0;
+    this.resetUI();
   }
 
-  resetUI() {
-    this.currentSelection = this.currentAnswer() || [];
-    this.isStageValid = this.currentSelection.length > 0;
+  private resetUI() {
+    this.currentSelection.set(this.currentAnswer() || []);
+    this.updateValidation();
+  }
+
+  private updateValidation() {
+    const selection = this.currentSelection();
+    const isValid = Array.isArray(selection) ? selection.length > 0 : selection.length > 0;
+    this.isStageValid.set(isValid);
   }
 }

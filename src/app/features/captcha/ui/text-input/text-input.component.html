@@ -1,31 +1,41 @@
-<div class="text-center" style="max-width: 400px; margin: 0 auto;">
-
-  <div class="card mb-3 shadow-sm">
-    <div class="card-body p-2 bg-light d-flex justify-content-center align-items-center">
-      <img [src]="data.src" alt="Type the characters you see" class="img-fluid rounded" style="max-height: 100px;">
+<div class="text-input-container">
+  <div class="card shadow-sm border-0 rounded-2 mb-3">
+    <div class="card-body p-3 bg-light d-flex justify-content-center align-items-center">
+      <img
+        [src]="data().src"
+        alt="Text to enter"
+        class="img-fluid rounded-1"
+        style="max-height: 120px; max-width: 100%"
+      />
     </div>
   </div>
 
-  <div class="form-floating mb-3">
+  <div class="form-floating">
     <input
       type="text"
-      class="form-control form-control-lg text-center fw-bold letter-spacing-2"
-      id="captchaInput"
+      class="form-control form-control-lg rounded-2"
+      id="textInput"
       placeholder="Type here"
       [formControl]="inputControl"
       autocomplete="off"
-      [class.is-invalid]="inputControl.invalid && inputControl.touched">
-
-    <label for="captchaInput">Enter characters</label>
+      [class.is-invalid]="inputControl.invalid && inputControl.touched"
+      aria-label="Enter text"
+    />
+    <label for="textInput" class="text-secondary">Enter text</label>
 
     @if (inputControl.invalid && inputControl.touched) {
-      <div class="invalid-feedback">
+      <div class="invalid-feedback d-block">
         Please enter the text shown above.
       </div>
     }
   </div>
 
-  <p class="text-muted small">
-    <i class="bi bi-info-circle me-1"></i> Case sensitivity depends on the challenge.
+  <p class="text-secondary small mt-3 mb-0">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; display: inline-block; margin-right: 6px;">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="16" x2="12" y2="12"></line>
+      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+    </svg>
+    Case sensitivity may apply
   </p>
 </div>

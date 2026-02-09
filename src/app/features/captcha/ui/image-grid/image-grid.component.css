@@ -1,21 +1,82 @@
+.image-card {
+  aspect-ratio: 1;
+  border: 2px solid #dee2e6;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
 
-.border-transparent {
-  border-color: transparent !important;
+.image-card:hover {
+  border-color: #0d6efd;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
+}
+
+.image-card.selected {
+  border-color: #198754;
+  box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.2);
+  background-color: rgba(25, 135, 84, 0.05);
+}
+
+.image-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.image-card:hover img {
+  transform: scale(1.05);
+}
+
+.image-card.selected img {
+  transform: scale(0.98);
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0);
+  transition: background 0.3s ease;
+}
+
+.image-card.selected .overlay {
+  background: rgba(25, 135, 84, 0.1);
+}
+
+.checkmark {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  background: #198754;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: scaleIn 0.3s ease;
+}
+
+.checkmark svg {
+  width: 18px;
+  height: 18px;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: translate(-50%, -50%) scale(0);
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1);
+  }
 }
 
 .cursor-pointer {
   cursor: pointer;
-}
-
-.transition-base {
-  transition: all 0.2s ease-in-out;
-
-  &:hover {
-    transform: scale(1.05);
-    z-index: 10;
-  }
-
-  &.border-primary {
-    transform: scale(0.95);
-  }
 }

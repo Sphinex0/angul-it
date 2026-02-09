@@ -1,5 +1,5 @@
-import { Component, Input, Output, EventEmitter, signal, OnChanges, SimpleChanges } from '@angular/core';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { Component, input, output, signal, effect } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-image-grid',
@@ -8,29 +8,25 @@ import { CommonModule, NgOptimizedImage } from '@angular/common';
   templateUrl: './image-grid.component.html',
   styleUrl: './image-grid.component.css'
 })
-export class ImageGridComponent implements OnChanges {
-  @Input({ required: true }) data: any;
-
-  @Input() initialSelection: string[] = [];
-
-  @Output() selectionChange = new EventEmitter<string[]>();
+export class ImageGridComponent {
+  data = input.required<any>();
+  initialSelection = input<string[]>([]);
+  selectionChange = output<string[]>();
 
   selectedIds = signal<string[]>([]);
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['data'] || changes['initialSelection']) {
-      this.selectedIds.set(this.initialSelection || []);
-    }
+  constructor() {
+    effect(() => {
+      this.selectedIds.set(this.initialSelection());
+    });
   }
 
   toggleSelection(id: string) {
-    this.selectedIds.update(current => {
-      if (current.includes(id)) {
-        return current.filter(x => x !== id);
-      } else {
-        return [...current, id];
-      }
-    });
+    this.selectedIds.update(current =>
+      current.includes(id)
+        ? current.filter(x => x !== id)
+        : [...current, id]
+    );
     this.selectionChange.emit(this.selectedIds());
   }
 

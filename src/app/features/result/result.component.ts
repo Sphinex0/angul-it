@@ -10,19 +10,16 @@ import { CaptchaService } from '../../core/services/captcha.service';
   styleUrl: './result.component.css'
 })
 export class ResultComponent {
-  private service = inject(CaptchaService);
-  private router = inject(Router);
-  duration = computed(() => {
-    const s = this.service.state();
+  private readonly service = inject(CaptchaService);
+  private readonly router = inject(Router);
 
-    if (s.startTime && s.endTime) {
-      return s.endTime - s.startTime;
-    }
-    return 0;
+  protected readonly duration = computed(() => {
+    const state = this.service.state();
+    return state.startTime && state.endTime ? state.endTime - state.startTime : 0;
   });
 
   restart() {
-    this.service.reset(); // Clear state and storage
-    this.router.navigate(['/']); // Go back to Home
+    this.service.reset();
+    this.router.navigate(['/']);
   }
 }

@@ -1,13 +1,20 @@
+.slider-container {
+  max-width: 500px;
+  margin: 0 auto;
+}
 
-input[type=range] {
+input[type='range'] {
   cursor: grab;
+  accent-color: #198754;
+  width: 100%;
+}
 
-  &:active {
-    cursor: grabbing;
-  }
+input[type='range']:active {
+  cursor: grabbing;
 }
 
 svg {
   overflow: hidden;
-  border-radius: 4px;
+  border-radius: 8px;
+  background-color: #f8f9fa;
 }

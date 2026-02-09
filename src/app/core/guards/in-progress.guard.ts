@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { CaptchaService } from '../services/captcha.service';
 
-export const inProgressGuard: CanActivateFn = (route, state) => {
+export const inProgressGuard: CanActivateFn = (_, __) => {
   const service = inject(CaptchaService);
   const router = inject(Router);
 
@@ -10,9 +10,5 @@ export const inProgressGuard: CanActivateFn = (route, state) => {
     return router.createUrlTree(['/result']);
   }
 
-  if (service.allStages().length === 0) {
-    return router.createUrlTree(['/']);
-  }
-
-  return true;
+  return service.allStages().length > 0 ? true : router.createUrlTree(['/']);
 };
