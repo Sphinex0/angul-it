@@ -4,9 +4,7 @@ import {
   CaptchaState,
   ImageChallengeData,
   GRID_DATASET,
-  TextChallengeData,
   TEXT_DATASET,
-  SliderChallengeData,
 } from '../models/captcha.types';
 
 const STORAGE_KEY = 'angul_it_state';

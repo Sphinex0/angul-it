@@ -1,4 +1,4 @@
-import { Component, inject, signal, effect } from '@angular/core';
+import { Component, inject, signal, effect, OnInit } from '@angular/core';
 import { CaptchaService } from '../../core/services/captcha.service';
 import { ImageGridComponent } from './ui/image-grid/image-grid.component';
 import { Router } from '@angular/router';
@@ -11,7 +11,7 @@ import { SliderCaptchaComponent } from './ui/slider-captcha/slider-captcha.compo
   templateUrl: './captcha.component.html',
   styleUrl: './captcha.component.css',
 })
-export class CaptchaComponent {
+export class CaptchaComponent implements OnInit {
   private readonly captchaService = inject(CaptchaService);
   private readonly router = inject(Router);
 
@@ -40,6 +40,10 @@ export class CaptchaComponent {
   protected get isValid() {
     return this.isStageValid();
   }
+  ngOnInit() {
+    this.resetUI();
+  }
+
 
   onSelectionChange(selectedIds: string[] | string) {
     this.currentSelection.set(selectedIds);
@@ -77,7 +81,8 @@ export class CaptchaComponent {
 
   private updateValidation() {
     const selection = this.currentSelection();
-    const isValid = Array.isArray(selection) ? selection.length > 0 : selection.length > 0;
+    const isValid = selection.length > 0 ;
     this.isStageValid.set(isValid);
   }
+  
 }
